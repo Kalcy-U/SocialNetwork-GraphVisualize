@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TheSocialNetwork | 社交网络及好友推荐可视化助手</title>
+    <meta name="description" content="中式菜谱可视化系统，能够显示菜品关联信息并提供搜索功能" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="" />
+    <link rel="shortcut icon" href="">
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cdef6708f1dc40904a5927911ec338c8";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    <script src="https://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+    <link href="https://libs.baidu.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<!-- 定义样式 -->
+<style>
+    /*body的样式*/
+    body {
+        background-color: #272b3011;
+        /*背景颜色*/
+        padding-bottom: 30px, 40px;
+        text-align: center;
+        font-family: OpenSans-Light, PingFang SC, Hiragino Sans GB, Microsoft Yahei, Microsoft Jhenghei, sans-serif;
+    }
+
+    /*之前在js代码里面定义了classes，这边就给这些写样式*/
+    .links line {
+        stroke: rgb(83, 83, 83);
+        /*线的颜色*/
+        stroke-opacity: 0.2;
+        /*线的透明度*/
+    }
+
+    .links line.heighlight {
+        stroke: rgb(255, 99, 99);
+        /*线的颜色*/
+        stroke-width: 2px;
+
+        stroke-opacity: 0.8;
+        /*线的透明度*/
+    }
+
+    .links line.inactive {
+        /*display: none !important;*/
+        stroke-opacity: 0;
+    }
+
+    .linetexts {
+        fill-opacity: 0;
+        font-size: 8px;
+        font-family: SimSun;
+        fill: white;
+    }
+
+    .linetexts.inactive {
+        display: none !important;
+    }
+
+    .nodes circle {
+        stroke: rgb(91, 87, 87);
+        stroke-width: 1px;
+        /*圆的描边宽度*/
+    }
+
+    .nodes circle.recommend {
+        stroke: none;
+        fill: aqua;
+        stroke-width: 1px;
+        stroke-opacity: 0.5;
+        opacity: 0.4;
+
+    }
+
+    .nodes circle.commenfriend {
+        stroke: none;
+        fill: rgb(255, 234, 0);
+        stroke-width: 1px;
+        stroke-opacity: 0.5;
+        opacity: 0.4;
+
+    }
+
+    .nodes circle:hover {
+        cursor: pointer;
+    }
+
+    .nodes circle.inactive {
+        display: none !important;
+    }
+
+
+    /*默认显示所有的圆圈，进入模式切换之后才会显示text*/
+    .texts text {
+        display: none;
+    }
+
+    .texts text:hover {
+        cursor: pointer;
+    }
+
+    .texts text.inactive {
+        display: none !important;
+    }
+
+    .texts text.visible {
+        opacity: 1;
+        fill: darkviolet
+    }
+
+    .texts text.recommend {
+        fill: deeppink;
+        opacity: 1;
+    }
+
+    /*indicator的样式*/
+    #indicator {
+        position: absolute;
+        left: 30px;
+        bottom: 90px;
+        text-align: left;
+        color: #4a4747;
+        font-size: 16px;
+    }
+
+    /*indicator中每一个小的div/色块/图例的样式*/
+    #indicator>div {
+        margin-bottom: 10px;
+    }
+
+    #indicator span {
+        display: inline-block;
+        width: 35px;
+        height: 20px;
+        position: relative;
+        top: 2px;
+        margin-right: 8px;
+    }
+
+    /*mode-模式切换的style*/
+    #mode {
+        position: absolute;
+        top: 100px;
+        left: 30px;
+    }
+
+    #mode span {
+        display: inline-block;
+        border: 1px solid rgb(68, 68, 68);
+        color: rgb(68, 68, 68);
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: color, background-color .3s;
+        /*CSS3中的渐变*/
+        -o-transition: color, background-color .3s;
+        -ms-transition: color, background-color .3s;
+        -moz-transition: color, background-color .3s;
+        -webkit-transition: color, background-color .3s;
+    }
+
+    /*当按键处于激活状态的时候*/
+    #mode span.active {
+        background-color: #fff;
+        color: #333;
+        cursor: pointer;
+    }
+
+    /*当按键处于鼠标悬浮状态的时候*/
+    #mode span:hover {
+        background-color: #aaa;
+        color: #333;
+        cursor: pointer;
+    }
+
+    /*info的样式*/
+    #info {
+        position: absolute;
+        top: 0px;
+        /*10px*/
+        /*bottom: 40px;*/
+        right: 10px;
+        /*20px*/
+        text-align: right;
+        /*right*/
+        width: 253px;
+        /*255px*/
+    }
+
+    #info p {
+        color: rgb(59, 68, 85);
+        font-size: 15px;
+        margin-top: 0px;
+        margin-bottom: 5px;
+    }
+
+    #info p span {
+        color: rgb(65, 62, 76);
+        margin-right: 0px;
+    }
+
+    /*tips的样式*/
+    #tips {
+        position: absolute;
+        left: 20px;
+        right: 10px;
+        top: 320px;
+        text-align: left;
+        color: #6c5656;
+        font-size: 16px;
+        width: 260px;
+    }
+
+    /*indicator中每一个小的div/色块/图例的样式*/
+    #tips>div {
+        margin-bottom: 5px;
+    }
+
+    #tips span {
+        font-size: 20px;
+        font-weight: bold;
+        display: inline-block;
+        width: 60px;
+        height: 20px;
+        position: relative;
+        top: 2px;
+        margin-right: 8px;
+        bottom: 2px;
+
+    }
+
+    #tips p {
+        font-size: 16px;
+    }
+
+    /*搜索框的样式*/
+    #search div {
+        position: absolute;
+        top: 150px;
+        left: 30px;
+
+    }
+
+    #search input {
+        color: rgb(108, 108, 108);
+        border: none;
+        outline: none;
+        box-shadow: none;
+        width: 200px;
+        height: 30px;
+        margin-bottom: 8px;
+        background-color: rgb(255, 255, 255);
+    }
+</style>
+
+<body>
+    <!-- 标题 -->
+    <h1
+        style="color: rgb(60, 60, 60);font-size: 32px;margin-bottom: 10px;margin-top: 10px; text-align: left;margin-left: 40px">
+        TheSocialNetwork | 社交网络可视化</h1>
+
+    <!-- 定义div存放关系图 -->
+    <!-- NOTE: 父元素采用相对定位，里面的元素采用绝对定位 -->
+    <div style="text-align: center;position: relative;">
+        <svg width="1080" height="1000" style="margin-left: 30px;margin-bottom: -30px" id="svg1"></svg>
+        <!-- 图例 -->
+        <div id="indicator"></div>
+
+        <!-- 模式 -->
+        <div id="mode">
+            <span class="active" style="border-top-right-radius: 0;border-bottom-right-radius: 0;">Circles</span>
+            <span
+                style="border-top-left-radius: 0;border-bottom-left-radius: 0;position: relative;left: -5px;">Texts</span>
+        </div>
+        <!-- 搜索框 -->
+        <div id="search">
+            <div>
+
+                <input name='Uname1' id="Uname1" type="text" autocomplete="off" class="form-control"
+                    placeholder="请输入用户1的姓名或id" />
+                <input name='Uname2' id="Uname2" type="text" autocomplete="off" class="form-control"
+                    placeholder="请输入用户2的姓名或id" />
+                <button id='search_recommended' type="submit" class="btn btn-default">查询推荐指数</button>
+
+            </div>
+        </div>
+
+        <!-- 每个结点的信息 -->
+        <div id="info">
+            <h2></h2>
+            <h4></h4>
+
+        </div>
+
+        <!-- 提示 -->
+        <div id="tips"></div>
+    </div>
+    /*
+    <div style="text-align: center;position: relative;">
+        <svg width="1280" height="1000" id="svg2" style="margin-right: 40px;">
+            <!-- D3 -->
+            <g></g>
+        </svg>
+    </div>
+    */
+
+</body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<!-- 自定义的js代码 -->
+
+<script>
+    $(document).ready(function () {
+        // 定义svg变量，选出第一个图
+        var svg = d3.select("#svg1"),
+            width = svg.attr('width'),
+            height = svg.attr('height');
+        var colors = ['#6ca46c', '#ca635f', '#4e88af', '#0A7373',
+            '#B7BF99', '#EDAA25', '#C43302', '#3A37A6',
+            '#BF1792', '#F2A81D', '#D96E11', '#F2B4AE',
+            '#BF5A75', '#4A5B8C', '#557338', '#F26A4B', '#D98299'];
+
+
+        var help = ['tips:',
+            '1.如果没有出现节点和边的网状图形，请刷新',
+            '2.鼠标悬停在任意节点上，不透明节点表示该用户的直接好友，半透明蓝色节点表示推荐好友，右侧为用户相关信息和推荐好友列表',
+            '3.搜索框中两名输入用户id或名称，可显示两人的共同好友',
+            '4.模式切换按钮可切换对节点的不同可视化表示，Circles为点，Texts为文字',
+            '5.节点颜色表示用户所属的学校',
+            '6.人际关系网络来自数据集<a href="https://socialnetworks.mpi-sws.org/data-imc2007.html" target="_blank">IMC 2007 Data Sets</a>，姓名为随机生成',
+            '7.推荐值=共同好友数量*(1+0.4*共同学校)'
+
+
+        ];
+        $('#tips').append("<span>" + help[0] + "</span>")
+        for (var i = 1; i < help.length; i++) {
+            // 选中indicator，每一种都append一个div，就是前面的小色块
+            $('#tips').append("<p>" + help[i] + "</p>")
+        }
+
+        // 定义D3的simulation是如何展示出来的
+        var simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().id(function (d) {
+                return d.id;
+            }))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(width / 2, height / 2));
+
+        // 存之后生成的关系图数据
+        var graph;
+
+        d3.json("..\\static\\data\\jdata_r.json", function (error, data) {
+            if (error) throw error;
+
+            graph = data;
+            // console.log(graph)
+
+            // D3数据驱动文档
+            // 用links去驱动line的线宽
+            var link = svg.append('g')
+                .attr("class", "links")
+                .selectAll("line")
+                .data(graph.links)
+                .enter().append("line")
+                .attr('stroke-width', function (d) {
+                    // return Math.sqrt(d.value);
+                    return 1;
+                });
+
+            // 添加所有的node
+            var node = svg.append('g')
+                .attr('class', 'nodes')
+                .selectAll('circle')
+                .data(graph.nodes)
+                .enter().append('circle')
+                .attr("r", function (d) {
+                    return 10;
+                })
+                .attr('fill', function (d) { // 填充的颜色
+                    return colors[d.group];
+                })
+                .attr('stroke', 'none')    // 没有描边
+                .attr('name', function (d) {
+                    return d.Uname;
+                })
+                .attr('id', function (d) { return d.id; })
+                .call(d3.drag()             // 绑定d3的拖动函数
+                    .on("start", dragstarted) // 拖动开始
+                    .on("drag", dragged)      // 拖动进行
+                    .on("end", dragended));   // 拖动结束
+
+
+            // 文本
+            // 两种显示模式，每个结点可以用一个圆或者文本表示
+            var text = svg.append('g')
+                .attr("class", "texts")
+                .selectAll("text")
+                .data(graph.nodes)
+                .enter().append("text")
+                .attr("font-size", function (d) {
+                    return 12;
+                })
+                .attr("fill", function (d) {
+                    return colors[d.group];
+                })
+                .attr('name', function (d) {
+                    return d.Uname;
+                })
+                .attr('id', function (d) { return d.id; })
+                .text(function (d) {
+                    return d.Uname;
+                })
+
+                .attr('text-anchor', 'middle')
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended));
+
+            // 给node加title, 当鼠标悬浮在圆圈上的时候
+            node.append('title').text(function (d) {
+                return d.name;
+            })
+
+            // 处理缩放
+            svg.call(d3.zoom()
+                .scaleExtent([1 / 8, 8])
+                .on("zoom", zoomed));
+
+            function zoomed() {
+                link.attr("transform", d3.event.transform);
+                node.attr("transform", d3.event.transform);
+                text.attr("transform", d3.event.transform);
+                //linktext.attr('transform', d3.event.transform);
+            }
+
+            simulation
+                .nodes(graph.nodes)
+                .on("tick", ticked);
+
+            simulation.force("link")
+                .links(graph.links);
+
+            function ticked() {
+                link
+                    .attr("x1", function (d) {
+                        return d.source.x;
+                    })
+                    .attr("y1", function (d) {
+                        return d.source.y;
+                    })
+                    .attr("x2", function (d) {
+                        return d.target.x;
+                    })
+                    .attr("y2", function (d) {
+                        return d.target.y;
+                    });
+
+                node
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    });
+
+                text
+                    .attr("dx", function (d) {
+                        return d.x;
+                    })
+                    .attr("dy", function (d) {
+                        return d.y;
+                    });
+            }
+        })
+
+        // 拖动事件函数
+        var dragging = false;
+
+        function dragstarted(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+            dragging = true;
+        }
+
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+
+        function dragended(d) {
+            if (!d3.event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+            dragging = false;
+        }
+
+        // 处理模式点击后的事件(这些元素页面上本来有)
+        $('#mode span').click(function (event) {
+            // 把mode里面所有span的active全部去掉
+            // 把被点击的这个设置为active
+            $('#mode span').removeClass('active')
+            $(this).addClass('active')
+
+            if ($(this).text() == 'Circles') {
+                // 隐藏所有文本里面的svg元素
+                // 把node里面的显示出来
+                $('.texts text').hide();
+                $('.nodes circle').show();
+            }
+            else {
+                $('.texts text').show();
+                $('.nodes circle').hide();
+            }
+        });
+
+        // 处理事件：选中结点后只显示选中点及其直接相邻点
+        // 这些元素原来没有，后面添加上去，所以写法和上面不同
+        // 为#svg1中所有的 `.nodes circle` 元素，绑定了 `mouseenter`事件 
+        $('#svg1').on('mouseenter', '.nodes circle', function (event) {
+            // 拖动的时候，如果碰到别的结点，效果会发生变化，看起来很乱
+            // 所以拖动的时候不允许触发鼠标进入事件
+            if (!dragging) {
+                var name = $(this).attr('id');
+                var strname = $(this).attr('name')
+                recommend_list = $(this).context.__data__.recommend;
+                //console.log($(this).context.__data__.recommend);
+                d3.select('#svg1 .nodes').selectAll('circle').attr('class', function (d) {
+                    // 是目前悬浮的那个
+                    if (d.id == name) {
+                        return '';
+                    }
+                    for (let i = 0; i < recommend_list.length; i++) {
+                        if (d.id == recommend_list[i]['id'])
+                            return 'recommend';
+                    }
+                    // 不是悬浮的那个，需要显示相邻的circle，对其他的圆圈做处理
+                    // 遍历图中的所有link
+                    for (var i = 0; i < graph.links.length; i++) {
+                        if (graph.links[i]['source'].id == name && graph.links[i]['target'].id == d.id) {
+                            return '';
+                        }
+                        if (graph.links[i]['target'].id == name && graph.links[i]['source'].id == d.id) {
+                            return '';
+                        }
+                    }
+
+                    return 'inactive';
+
+                });
+                // 把info标题的颜色改为结点所属类别的颜色
+                $('#info h2').css('color', $(this).attr('fill')).text(strname + "(" + name + ")");
+
+                // 去掉旧的<p></p>
+                $('#info p').remove();
+
+                rank = 0;
+                for (var i = 0; i < recommend_list.length; i++) {
+                    rcm = recommend_list[i];
+                    rcm_info = "" + (++rank) + ". " + rcm.Uname + "(" + rcm.id + ") 推荐值：" + rcm.recommended
+                    //console.log(rcm_info)
+                    $('#info').append('<p>' + rcm_info + '</p>');
+
+                }
+                if (recommend_list.length == 0) {
+                    $('#info').append('<p>' + '这个人的社交关系太少啦，找不到推荐好友T_T' + '</p>');
+                }
+                // 处理连接line,高亮相连的
+                d3.select("#svg1 .links").selectAll('line').attr('class', function (d) {
+                    if (d.source.id == name || d.target.id == name) {
+                        return 'heighlight';
+                    } else {
+                        return '';
+                    }
+                });
+            }
+        });
+        // 处理鼠标移开的事件上
+        $('#svg1').on('mouseleave', '.nodes circle', function (event) {
+            if (!dragging) {
+                // 否则，离开时把nodes和links的inactive去掉
+                d3.select('#svg1 .nodes').selectAll('circle').attr('class', '');
+                d3.select("#svg1 .links").selectAll('line').attr('class', '');
+                d3.select('#svg1 .texts').selectAll('text').attr('class', '');
+            }
+        });
+
+        $('#svg1').on('mouseenter', '.texts text', function (event) {
+
+            if (!dragging) {
+                var name = $(this).attr('id');
+                var strname = $(this).attr('name')
+                recommend_list = $(this).context.__data__.recommend;
+                d3.select('#svg1 .texts').selectAll('text').attr('class', function (d) {
+                    // 是目前悬浮的那个
+                    if (d.id == name) {
+                        return 'visible';
+                    }
+                    for (let i = 0; i < recommend_list.length; i++) {
+                        //console.log(d.id)
+                        if (d.id == recommend_list[i]['id'])
+                            return 'recommend';
+                    }
+                    // 不是悬浮的那个，需要显示相邻的circle，对其他的圆圈做处理
+                    // 遍历图中的所有link
+                    for (var i = 0; i < graph.links.length; i++) {
+                        if (graph.links[i]['source'].id == name && graph.links[i]['target'].id == d.id) {
+                            return 'visible';
+                        }
+                        if (graph.links[i]['target'].id == name && graph.links[i]['source'].id == d.id) {
+                            return 'visible';
+                        }
+                    }
+                    return 'inactive'
+                });
+                // 把info标题的颜色改为结点所属类别的颜色
+                $('#info h2').css('color', $(this).attr('fill')).text(strname + "(" + name + ")");
+
+                // 去掉旧的<p></p>
+                $('#info p').remove();
+                rank = 0;
+
+                for (var i = 0; i < recommend_list.length; i++) {
+                    rcm = recommend_list[i];
+                    rcm_info = "" + (++rank) + ". " + rcm.Uname + "(" + rcm.id + ") 推荐值：" + rcm.recommended
+
+                    $('#info').append('<p>' + rcm_info + '</p>');
+
+                }
+                if (recommend_list.length == 0) {
+                    $('#info').append('<p>' + '这个人的社交关系太少啦，找不到推荐好友T_T' + '</p>');
+                }
+                // 处理连接line,高亮相连的
+                d3.select("#svg1 .links").selectAll('line').attr('class', function (d) {
+
+                    if (d.source.id == name || d.target.id == name) {
+                        return 'heighlight';
+                    } else {
+                        return '';
+                    }
+                });
+            }
+        });
+
+        $('#svg1').on('mouseleave', '.texts text', function (event) {
+            if (!dragging) {
+
+                d3.select('#svg1 .nodes').selectAll('circle').attr('class', '');
+                d3.select("#svg1 .links").selectAll('line').attr('class', '');
+                d3.select('#svg1 .texts').selectAll('text').attr('class', '');
+            }
+        });
+
+        // 搜索功能
+
+        $("#search_recommended").click(function () {
+            //console.log($('#Uname1').val());
+            //console.log($('#Uname2').val());
+            $.get("/search_recommended", { "Uname1": $('#Uname1').val(), "Uname2": $('#Uname2').val() },
+                function (data) {
+                    if (data) {
+
+                        if (data.success == false) {
+                            alert(data.info);
+
+                            return;
+                        }
+                        else {
+                            $('#info h2').css('color', 'darkred').text(data.user1.Uname + "(" + data.user1.id + ") &  " + data.user2.Uname + "(" + data.user2.id + ")");
+                            // 去掉旧的<p></p>
+                            $('#info p').remove();
+
+                            $('#info').append('<p>' + data.info + '</p>');
+                            //改变共同好友节点
+                            friend_count = data['friends'].length;
+
+                            d3.select("#svg1 .nodes").selectAll('circle').attr('class', function (d) {
+                                if (d.id == data.user1.id || d.id == data.user2.id)
+                                    return '';
+                                for (let j = 0; j < friend_count; j++) {
+                                    if (d.id == data['friends'][j])
+                                        return 'commenfriend';
+
+                                }
+                                return 'inactive';
+                            });
+
+                            //d3.select('#svg1 .nodes').selectAll('circle').select('#' + data['friends'][i]).attr('class', 'commenfriend');
+                        }
+                    }
+
+                },
+                "json"
+            );
+        })
+
+
+    });
+
+</script>
+
+</html>
