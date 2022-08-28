@@ -6,19 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TheSocialNetwork | 社交网络及好友推荐可视化助手</title>
-    <meta name="description" content="中式菜谱可视化系统，能够显示菜品关联信息并提供搜索功能" />
-    <meta name="keywords" content="" />
-    <meta name="author" content="" />
-    <link rel="shortcut icon" href="">
-    <script>
-        var _hmt = _hmt || [];
-        (function () {
-            var hm = document.createElement("script");
-            hm.src = "https://hm.baidu.com/hm.js?cdef6708f1dc40904a5927911ec338c8";
-            var s = document.getElementsByTagName("script")[0];
-            s.parentNode.insertBefore(hm, s);
-        })();
-    </script>
+    <meta name="description" content="社交网络及好友推荐可视化助手" />
     <script src="https://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
     <link href="https://libs.baidu.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -150,7 +138,7 @@
     /*mode-模式切换的style*/
     #mode {
         position: absolute;
-        top: 100px;
+        top: 60px;
         left: 30px;
     }
 
@@ -214,10 +202,10 @@
         position: absolute;
         left: 20px;
         right: 10px;
-        top: 320px;
+        top: 250px;
         text-align: left;
         color: #6c5656;
-        font-size: 16px;
+        font-size: 13px;
         width: 260px;
     }
 
@@ -240,13 +228,13 @@
     }
 
     #tips p {
-        font-size: 16px;
+        font-size: 13px;
     }
 
     /*搜索框的样式*/
     #search div {
         position: absolute;
-        top: 150px;
+        top: 110px;
         left: 30px;
 
     }
@@ -305,14 +293,14 @@
         <!-- 提示 -->
         <div id="tips"></div>
     </div>
-    /*
+
     <div style="text-align: center;position: relative;">
         <svg width="1280" height="1000" id="svg2" style="margin-right: 40px;">
             <!-- D3 -->
             <g></g>
         </svg>
     </div>
-    */
+
 
 </body>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -331,9 +319,9 @@
 
 
         var help = ['tips:',
-            '1.如果没有出现节点和边的网状图形，请刷新',
+            '1.如果没有出现节点和边的网状图形，请刷新。数据托管在GitHub，可能需要科学上网',
             '2.鼠标悬停在任意节点上，不透明节点表示该用户的直接好友，半透明蓝色节点表示推荐好友，右侧为用户相关信息和推荐好友列表',
-            '3.搜索框中两名输入用户id或名称，可显示两人的共同好友',
+            '3.搜索框中两名输入用户id或名称，可显示两人的共同好友。当前状态不支持，部署后端后可以体验。',
             '4.模式切换按钮可切换对节点的不同可视化表示，Circles为点，Texts为文字',
             '5.节点颜色表示用户所属的学校',
             '6.人际关系网络来自数据集<a href="https://socialnetworks.mpi-sws.org/data-imc2007.html" target="_blank">IMC 2007 Data Sets</a>，姓名为随机生成',
@@ -358,7 +346,7 @@
         // 存之后生成的关系图数据
         var graph;
 
-        d3.json("..\\static\\data\\jdata_r.json", function (error, data) {
+        d3.json("https://raw.githubusercontent.com/Kalcy-U/SocialNetwork-GraphVisualize/master/static/data/jdata_r.json", function (error, data) {
             if (error) throw error;
 
             graph = data;
@@ -671,8 +659,7 @@
                     if (data) {
 
                         if (data.success == false) {
-                            alert(data.info);
-
+                            alert('请检查输入~');
                             return;
                         }
                         else {
@@ -695,13 +682,14 @@
                                 return 'inactive';
                             });
 
-                            //d3.select('#svg1 .nodes').selectAll('circle').select('#' + data['friends'][i]).attr('class', 'commenfriend');
                         }
                     }
 
                 },
                 "json"
-            );
+            ).fail(function () {
+                alert('查询推荐指数功能需要部署后端~')
+            });
         })
 
 
