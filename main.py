@@ -1,5 +1,5 @@
 import codecs
-
+import os
 from itsdangerous import json
 
 from py.SocialNetwork.graph import  Graph
@@ -63,6 +63,7 @@ if __name__ == '__main__':
 	snw = load_info()
 	snw.form_json_data_with_recommend('.\\static\\data\\jdata_r.json')
 	app.run()
+	os.system("pause");
 
 
 

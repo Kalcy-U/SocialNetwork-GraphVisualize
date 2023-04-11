@@ -1,9 +1,10 @@
 import codecs
 import json
-
 import pandas
-from faker import Faker
+
 import re
+
+from py.SocialNetwork.random_name.random_name import Random_name
 
 
 class Graph:
@@ -19,7 +20,7 @@ class Graph:
     def give_node_data(self, circle_path):
         # id，姓名
         for i in range(self.vexnum):
-            self.nodes[i] = dict(id=i + self.start_id, Uname=Faker('zh_CN').name(), group=[], index=i)
+            self.nodes[i] = dict(id=i + self.start_id, Uname=Random_name().name(), group=[], index=i)
         # 群组
         with open(circle_path, 'r') as file1:
             circles = file1.readlines()
@@ -119,7 +120,7 @@ class Graph:
     def form_json_data_with_recommend(self, savepath):
         for idx in range(self.vexnum):
             rlist = self.recommendilist(idx + self.start_id, length=10, friend_weight=1, group_weight=0.4)
-            print(rlist)
+            # print(rlist)
             self.nodes[idx]['recommend'] = rlist
         file = codecs.open(savepath, 'w', 'utf-8')
         json.dump(dict(links=self.links, nodes=self.nodes), file, ensure_ascii=False, indent=1)
