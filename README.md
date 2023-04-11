@@ -1,8 +1,8 @@
 ## 人际关系网络可视化及好友推荐系统
 
-![homepage](https://raw.github.com/Kalcy-U/master/SocialNetwork-GraphVisualize/img/image-20220828185359762.png)
+![homepage](https://github.com/Kalcy-U/SocialNetwork-GraphVisualize/raw/master/img/image-20220828180221283.png)
 
-![demo](https://raw.github.com/Kalcy-U/master/SocialNetwork-GraphVisualize/img/image-20220828174830668.png)
+![demo](E:\coding\javascript\socialNetwork\README.assets\image-20220828174830668.png)
 
 #### 说明
 
@@ -26,7 +26,7 @@
 
 #### 运行
 
-方法1：直接打开index_min.html。建议使用chrome浏览器。部分功能受限。
+方法1：访问GitHub.io浏览静态网页：https://kalcy-u.github.io/SocialNetwork-GraphVisualize/
 
 方法2:  部署后端。安装python依赖库，运行main.py。
 
