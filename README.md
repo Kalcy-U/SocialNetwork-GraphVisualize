@@ -1,6 +1,8 @@
 ## 人际关系网络可视化及好友推荐系统
 
-![image-20220828185359762](C:\Users\ZZZ\AppData\Roaming\Typora\typora-user-images\image-20220828185359762.png)
+![homepage](https://raw.github.com/Kalcy-U/master/SocialNetwork-GraphVisualize/img/image-20220828185359762.png)
+
+![demo](https://raw.github.com/Kalcy-U/master/SocialNetwork-GraphVisualize/img/image-20220828174830668.png)
 
 #### 说明
 
