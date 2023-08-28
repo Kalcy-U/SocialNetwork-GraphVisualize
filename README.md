@@ -18,7 +18,7 @@
 
 6. 人际关系网络来自数据集
 
-[IMC 2007 Data Sets]: https://socialnetworks.mpi-sws.org/data-imc2007.html
+[IMC 2007 Data Sets]: https://socialnetworks.mpi-sws.org/data-imc2007.html "IMC 2007 Data Sets"
 
  姓名为随机生成
 
