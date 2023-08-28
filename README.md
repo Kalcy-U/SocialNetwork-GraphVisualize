@@ -16,10 +16,8 @@
 
 5. 节点颜色表示用户所属的学校
 
-6. 人际关系网络来自数据集
-
-[IMC 2007 Data Sets]: https://socialnetworks.mpi-sws.org/data-imc2007.html "IMC 2007 Data Sets"
-
+6. 人际关系网络来自数据集 IMC 2007 Data Sets
+(https://socialnetworks.mpi-sws.org/data-imc2007.html)
  姓名为随机生成
 
 7. 推荐值 = 共同好友数量 * (1+0.4 * 共同学校)
